@@ -53,6 +53,7 @@ export default connectContainer(class extends Component {
     return (
       <Confirm title={languageDictionary.deleteDialogTitle || "Delete User?"}
                show={requesting} loading={loading}
+               confirmMessage={languageDictionary.dialogConfirmText} cancelMessage={languageDictionary.dialogCancelText}
                onCancel={cancelDeleteUser} onConfirm={this.onConfirm}
                languageDictionary={languageDictionary}>
         <Error title={languageDictionary.errorTitle} message={getErrorMessage(languageDictionary.errors, error)} />

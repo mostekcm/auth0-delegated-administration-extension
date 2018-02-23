@@ -53,6 +53,7 @@ export default connectContainer(class extends Component {
     return (
       <Confirm title={languageDictionary.blockDialogTitle || "Block User?"}
                show={requesting} loading={loading}
+               confirmMessage={languageDictionary.dialogConfirmText} cancelMessage={languageDictionary.dialogCancelText}
                onCancel={cancelBlockUser} onConfirm={this.onConfirm}
                languageDictionary={languageDictionary}>
         <Error title={languageDictionary.errorTitle} message={getErrorMessage(languageDictionary.errors, error)} />

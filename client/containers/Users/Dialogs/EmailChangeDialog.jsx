@@ -72,6 +72,7 @@ export default connectContainer(class extends Component {
     return (
       <Confirm
         title={languageDictionary.changeEmailTitle || 'Change Email?'}
+        confirmMessage={languageDictionary.dialogConfirmText} cancelMessage={languageDictionary.dialogCancelText}
         show={requesting} loading={loading} onCancel={cancelEmailChange}
         onConfirm={this.onConfirm}
       >

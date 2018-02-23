@@ -78,6 +78,8 @@ export default connectContainer(class extends Component {
         title={languageDictionary.changeUsernameTitle || 'Change Username?'}
         show={requesting}
         loading={loading}
+        confirmMessage={languageDictionary.dialogConfirmText}
+        cancelMessage={languageDictionary.dialogCancelText}
         onCancel={cancelUsernameChange}
         languageDictionary={languageDictionary}
         onConfirm={this.onConfirm}>

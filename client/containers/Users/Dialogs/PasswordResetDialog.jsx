@@ -86,6 +86,8 @@ export default connectContainer(class extends Component {
         title={languageDictionary.resetPasswordTitle || 'Reset Password?'}
         show={requesting}
         loading={loading}
+        confirmMessage={languageDictionary.dialogConfirmText}
+        cancelMessage={languageDictionary.dialogCancelText}
         onCancel={cancelPasswordReset}
         languageDictionary={languageDictionary}
         onConfirm={this.onConfirm}>

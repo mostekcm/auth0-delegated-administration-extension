@@ -53,6 +53,8 @@ export default connectContainer(class extends Component {
         title={languageDictionary.resendVerificationEmailTitle || "Resend Verification Email?" }
         show={requesting}
         loading={loading}
+        confirmMessage={languageDictionary.dialogConfirmText}
+        cancelMessage={languageDictionary.dialogCancelText}
         onCancel={cancelResendVerificationEmail}
         languageDictionary={languageDictionary}
         onConfirm={this.onConfirm}>

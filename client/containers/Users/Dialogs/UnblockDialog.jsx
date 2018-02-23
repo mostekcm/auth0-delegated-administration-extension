@@ -54,6 +54,8 @@ export default connectContainer(class extends Component {
         title={languageDictionary.unblockDialogTitle || "Unblock User?"}
         show={requesting}
         loading={loading}
+        confirmMessage={languageDictionary.dialogConfirmText}
+        cancelMessage={languageDictionary.dialogCancelText}
         onCancel={cancelUnblockUser}
         languageDictionary={languageDictionary}
         onConfirm={this.onConfirm}>

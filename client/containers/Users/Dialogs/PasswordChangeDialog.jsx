@@ -70,7 +70,7 @@ export default connectContainer(class PasswordChangeDialog extends Component {
     usePasswordFields(true, fields);
     useDisabledConnectionField(true, fields, connection);
     useDisabledEmailField(true, fields);
-
+    console.log(fields);
     const allowedFields = ['email', 'connection', 'password', 'repeatPassword'];
     const filteredFields = _.filter(fields,
       field => _.includes(allowedFields, field.property));
@@ -82,6 +82,8 @@ export default connectContainer(class PasswordChangeDialog extends Component {
         title={languageDictionary.changePasswordTitle || 'Change Password?'}
         show={requesting}
         loading={loading}
+        confirmMessage={languageDictionary.dialogConfirmText}
+        cancelMessage={languageDictionary.dialogCancelText}
         onCancel={cancelPasswordChange}
         languageDictionary={languageDictionary}
         onConfirm={this.onConfirm}>

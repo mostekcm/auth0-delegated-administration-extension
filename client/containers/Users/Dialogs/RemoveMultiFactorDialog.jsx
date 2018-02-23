@@ -53,6 +53,8 @@ export default connectContainer(class extends Component {
         title={languageDictionary.removeMultiFactorTitle || "Remove Multi Factor Authentication?" }
         show={requesting}
         loading={loading}
+        confirmMessage={languageDictionary.dialogConfirmText}
+        cancelMessage={languageDictionary.dialogCancelText}
         onCancel={cancelRemoveMultiFactor}
         languageDictionary={languageDictionary}
         onConfirm={this.onConfirm}>
