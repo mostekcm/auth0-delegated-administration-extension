@@ -125,7 +125,7 @@ export default class UserInfo extends Component {
       return field;
     });
     const nonNullFields = _.filter(fieldsAndValues, field => field.value) || [];
-    console.log(getErrorMessage(languageDictionary.errors, error));
+
     return (
       <LoadingPanel show={loading} animationStyle={{ paddingTop: '5px', paddingBottom: '5px' }}>
         <Error title={languageDictionary.errorTitle} message={getErrorMessage(languageDictionary.errors, error)} />

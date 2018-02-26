@@ -466,15 +466,16 @@ export default (storage, scriptManager) => {
   /*
    * Remove MFA for the user.
    */
-  api.delete('/:id/multifactor/:provider', verifyUserAccess('remove:multifactor-provider', scriptManager), (req, res, next) => {
-    if (req.params.provider !== 'guardian') {
-      return req.auth0.users.deleteMultifactorProvider({ id: req.params.id, provider: req.params.provider })
-        .then(() => res.sendStatus(204))
-        .catch(next);
-    }
+  api.delete('/:id/multifactor', verifyUserAccess('remove:multifactor-provider', scriptManager), (req, res, next) => {
+    const providers = req.body.provider || [];
 
-    getApiToken(req)
-      .then((accessToken) => removeGuardian(accessToken, req.params.id))
+    Promise.map(providers, (provider) => {
+      if (provider !== 'guardian') {
+        return req.auth0.users.deleteMultifactorProvider({ id: req.params.id, provider });
+      }
+
+      return getApiToken(req).then((accessToken) => removeGuardian(accessToken, req.params.id));
+    })
       .then(() => res.sendStatus(204))
       .catch(next);
   });
