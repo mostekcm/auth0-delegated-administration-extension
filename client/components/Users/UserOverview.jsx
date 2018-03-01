@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { findDOMNode } from 'react-dom';
 import _ from 'lodash';
+import { Error, LoadingPanel, TableTotals, SearchBar } from 'auth0-extension-ui';
 
 import { LuceneSearchBar, UsersTable } from './';
-import { Error, LoadingPanel, TableTotals, SearchBar } from 'auth0-extension-ui';
 import getErrorMessage from '../../utils/getErrorMessage';
 import './UserOverview.styles.css';
 
@@ -49,13 +50,18 @@ export default class UserOverview extends React.Component {
     this.onHandleOptionChange = this.onHandleOptionChange.bind(this);
   }
 
+  onSearch = (query, filter) => {
+    this.props.onSearch(query, filter, this.focusSearchResults);
+  }
+
   onKeyPress = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       const query = e.target.value;
-      this.props.onSearch(query, this.state.selectedFilter.filterBy);
+      this.onSearch(query, this.state.selectedFilter.filterBy);
     }
   }
+
 
   onReset() {
     this.props.onReset();
@@ -70,11 +76,17 @@ export default class UserOverview extends React.Component {
     });
   }
 
+  focusSearchResults = () => {
+    const searchResults = findDOMNode(this.refs.searchResults);
+    const element = searchResults.querySelector('a') || searchResults.querySelector('label');
+    element.focus();
+  };
+
   render() {
     const { loading, sortProperty, sortOrder, error, settings } = this.props;
     const languageDictionary = this.props.languageDictionary || {};
     const labels = languageDictionary.labels || {};
-    const searchOptions = this.searchOptions.map(option => {
+    const searchOptions = this.searchOptions.map((option) => {
       option.title = labels[option.value] || option.value;
       return option;
     });
@@ -110,7 +122,7 @@ export default class UserOverview extends React.Component {
                 <LuceneSearchBar
                   inputId="search-bar"
                   onReset={this.props.onReset}
-                  onSearch={this.props.onSearch}
+                  onSearch={this.onSearch}
                   enabled={!loading}
                   languageDictionary={languageDictionary}
                 />
@@ -119,7 +131,7 @@ export default class UserOverview extends React.Component {
         </div>
         <LoadingPanel show={loading}>
           <div className="row">
-            <div className="col-xs-12">
+            <div className="col-xs-12" ref="searchResults">
               <UsersTable loading={loading} users={this.props.users}
                           userFields={this.props.userFields} onColumnSort={this.props.onColumnSort}
                           sortOrder={sortOrder} sortProperty={sortProperty}
