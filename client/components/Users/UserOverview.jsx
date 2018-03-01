@@ -5,6 +5,7 @@ import _ from 'lodash';
 import { LuceneSearchBar, UsersTable } from './';
 import { Error, LoadingPanel, TableTotals, SearchBar } from 'auth0-extension-ui';
 import getErrorMessage from '../../utils/getErrorMessage';
+import './UserOverview.styles.css';
 
 export default class UserOverview extends React.Component {
   static propTypes = {
@@ -87,8 +88,13 @@ export default class UserOverview extends React.Component {
         </div>
         <div className="row">
           <div className="col-xs-12">
+            <label className="hidden-label" htmlFor="search-bar">
+              {languageDictionary.searchBarPlaceholder || 'Search for users using the Lucene syntax'}
+            </label>
+
             {(searchOptions.length > 0) ? (
               <SearchBar
+                inputId="search-bar"
                 onReset={this.props.onReset}
                 enabled={!loading}
                 handleKeyPress={this.onKeyPress}
@@ -98,14 +104,17 @@ export default class UserOverview extends React.Component {
                 searchValue={this.state.searchValue}
                 placeholder={languageDictionary.searchBarPlaceholder}
                 resetButtonText={languageDictionary.searchBarReset}
-                instructionsText={languageDictionary.searchBarInstructions}/>
-            ) : (
-              <LuceneSearchBar
-                onReset={this.props.onReset}
-                onSearch={this.props.onSearch}
-                enabled={!loading}
-                languageDictionary={languageDictionary}/>
-            )}
+                instructionsText={languageDictionary.searchBarInstructions}
+              />
+              ) : (
+                <LuceneSearchBar
+                  inputId="search-bar"
+                  onReset={this.props.onReset}
+                  onSearch={this.props.onSearch}
+                  enabled={!loading}
+                  languageDictionary={languageDictionary}
+                />
+              )}
           </div>
         </div>
         <LoadingPanel show={loading}>
