@@ -22,7 +22,7 @@ export default connectContainer(class extends Component {
     logs: state.user.get('logs'),
     devices: state.user.get('devices'),
     settings: (state.settings.get('record') && state.settings.get('record').toJS().settings) || {},
-    languageDictionary: state.languageDictionary.get('record').toJS()
+    languageDictionary: state.languageDictionary.get('record').toJS() || {}
   });
 
   static actionsToProps = {
@@ -31,6 +31,7 @@ export default connectContainer(class extends Component {
   }
 
   static propTypes = {
+    languageDictionary: PropTypes.object.isRequired,
     accessLevel: PropTypes.object.isRequired,
     settings: PropTypes.object.isRequired,
     user: PropTypes.object,
@@ -64,6 +65,8 @@ export default connectContainer(class extends Component {
     const userFields = (settings && settings.userFields) || [];
     const suppressRawData = settings && settings.suppressRawData === true;
     const role = this.props.accessLevel.role;
+    const originalTitle = (settings.dict && settings.dict.title) || window.config.TITLE || 'User Management';
+    document.title = `${languageDictionary.userTitle || 'User Details'} - ${originalTitle}`;
 
     return (
       <div className="user">
