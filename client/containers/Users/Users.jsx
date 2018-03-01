@@ -88,6 +88,8 @@ class Users extends Component {
 
     const userFields = (settings && settings.userFields) || [];
     const role = accessLevel.get('record').get('role');
+    const originalTitle = (settings.dict && settings.dict.title) || window.config.TITLE || 'User Management';
+    document.title = `${languageDictionary.userUsersTabTitle || 'Users'} - ${originalTitle}`;
 
     return (
       <div className="users">
