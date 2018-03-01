@@ -50,7 +50,7 @@ export default class LogsTable extends Component {
               log.time_ago = moment(log.date).locale(languageDictionary.momentLocale || 'en').fromNow();
               return (
                 <TableRow key={index}>
-                  <TableIconCell color={icon.color} icon={icon.name} />
+                  <TableIconCell color={icon.color} icon={icon.name} title={logType} />
                   <TableTextCell onClick={onClick}>{logType || languageDictionary.logDialogDefaultLogRecordText || 'Log Record'}</TableTextCell>
                   <TableTextCell>{log.user_name || logDescription || log.type.description}</TableTextCell>
                   <TableTextCell>{log.time_ago}</TableTextCell>
