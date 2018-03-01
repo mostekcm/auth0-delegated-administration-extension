@@ -210,7 +210,13 @@ export default class UsersTable extends Component {
           {users.map(user =>
             <TableRow key={user.user_id}>
               <TableCell>
-                <img className="img-circle" src={user.picture} alt={name} width="32"/>
+                <img
+                  className="img-circle"
+                  src={user.picture}
+                  alt={user.name || user.user_name || user.email}
+                  title={user.name || user.user_name || user.email}
+                  width="32"
+                />
               </TableCell>
               {
                 listFields.map((field, index) => {
