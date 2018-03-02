@@ -164,9 +164,8 @@ export function toggleStyleSettings() {
   return (dispatch, getState) => {
     let settings = getState().settings.get('record').toJS();
     settings = settings.settings || settings || {};
-    const dict = settings.dict || {};
     const useAlt = localStorage.getItem('delegated-admin:use-alt-css') === 'true';
-    const path = useAlt ? dict.css : dict.altcss;
+    const path = useAlt ? settings.css : settings.altcss;
     localStorage.setItem('delegated-admin:use-alt-css', (!useAlt).toString());
     dispatch({
       type: constants.TOGGLE_STYLE_SETTINGS,

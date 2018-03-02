@@ -39,9 +39,7 @@ store.subscribe(() => {
           document.title = title;
         }
       }
-      const css = useAltCss ? dict.get('altcss') : dict.get('css');
-      console.log(useAltCss);
-      console.log(css);
+      const css = useAltCss ? settings.get('altcss') : settings.get('css');
       if (css !== '') {
         const head = document.getElementsByTagName('head')[0];
         const link = document.createElement('link');

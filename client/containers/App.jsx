@@ -54,7 +54,7 @@ class App extends Component {
     const { settingsLoading } = this.props;
     const languageDictionary = this.props.languageDictionary ? this.props.languageDictionary.toJS() : {};
     const settings = this.props.settings.get('settings') && this.props.settings.get('settings').toJS();
-    const renderCssToggle = !!(settings && settings.dict && settings.dict.css && settings.dict.altcss);
+    const renderCssToggle = !!(settings && settings.css && settings.altcss);
 
     if (settingsLoading) {
       return <LoadingPanel show={settingsLoading} />;
