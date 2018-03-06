@@ -11,6 +11,8 @@ export default class Header extends Component {
     accessLevel: PropTypes.object,
     issuer: PropTypes.string,
     onLogout: PropTypes.func.isRequired,
+    onCssToggle: PropTypes.func.isRequired,
+    renderCssToggle: PropTypes.bool,
     languageDictionary: PropTypes.object
   };
 
@@ -45,16 +47,34 @@ export default class Header extends Component {
     document.querySelector('#navbar-collapse li.dropdown').classList.remove('open');
   }
 
-  onKeyUp = (e) => {
-    if (e && e.key === 'Enter') {
-      this.props.onLogout();
+  onKeyUp = (event) => {
+    if (event && event.key === 'Enter') {
+      event.target.click();
     }
   };
+
+  renderCssSwitcher(languageDictionary) {
+    if (this.props.renderCssToggle) {
+      const toggleTextDefault = languageDictionary.toggleStyleSetDefault || 'Use Default Style';
+      const toggleTextAlt = languageDictionary.toggleStyleSetAlternative || 'Use Alternative Style';
+      const text = (window.localStorage && window.localStorage.getItem('delegated-admin:use-alt-css') === 'true') ? toggleTextDefault : toggleTextAlt;
+      return (
+        <li role="presentation">
+          <a role="menuitem" onClick={this.props.onCssToggle} onFocus={this.showOnFocus} onBlur={this.hideOnBlur} onKeyUp={this.onKeyUp} tabIndex="0">
+            {text}
+          </a>
+        </li>
+      );
+    }
+
+    return '';
+  }
 
   getMenu(isAdmin, languageDictionary) {
     if (!isAdmin) {
       return (
         <ul role="menu" className="dropdown-menu">
+          {this.renderCssSwitcher(languageDictionary)}
           <li role="presentation">
             <a role="menuitem" onClick={this.props.onLogout} onFocus={this.showOnFocus} onBlur={this.hideOnBlur} onKeyUp={this.onKeyUp} tabIndex="0">
               {languageDictionary.logoutMenuItemText || 'Logout'}
@@ -76,6 +96,7 @@ export default class Header extends Component {
             {languageDictionary.configurationMenuItemText || 'Configuration'}
           </Link>
         </li>
+        {this.renderCssSwitcher(languageDictionary)}
         <li role="presentation">
           <a role="menuitem" onClick={this.props.onLogout} onFocus={this.showOnFocus} onBlur={this.hideOnBlur} onKeyUp={this.onKeyUp} tabIndex="0">
             {languageDictionary.logoutMenuItemText || 'Logout'}

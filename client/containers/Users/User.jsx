@@ -135,6 +135,7 @@ export default connectContainer(class extends Component {
                   languageDictionary={languageDictionary}
                   error={logs.get('error')}
                   settings={settings}
+                  isUserLogs={true}
                 />
               </Tab>
               { this.renderProfile(suppressRawData, user, languageDictionary, settings) }
