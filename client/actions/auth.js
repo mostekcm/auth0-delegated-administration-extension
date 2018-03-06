@@ -67,6 +67,7 @@ const processTokens = (dispatch, apiToken, returnTo) => {
   }
 
   axios.defaults.headers.common.Authorization = `Bearer ${apiToken}`;
+  axios.defaults.headers.common['dae-locale'] = localStorage.getItem('dae:locale') || 'en';
 
   sessionStorage.setItem('delegated-admin:apiToken', apiToken);
 
