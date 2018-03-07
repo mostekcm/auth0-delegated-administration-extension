@@ -16,7 +16,7 @@ const webAuth = new auth0.WebAuth({ // eslint-disable-line no-undef
 });
 
 export function login(returnUrl, locale) {
-  sessionStorage.setItem('delegated-admin:returnTo', returnUrl || '/users');
+  sessionStorage.setItem('delegated-admin:returnTo', returnUrl || `/${locale}/users`);
 
   webAuth.authorize({
     responseType: 'id_token',
