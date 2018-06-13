@@ -12,16 +12,16 @@ const webAuth = new auth0.WebAuth({ // eslint-disable-line no-undef
   overrides: {
     __tenant: issuer.substr(8).split('.')[0],
     __token_issuer: issuer
-  }
+  },
+  scope: 'openid roles',
+  responseType: 'id_token',
+  redirectUri: `${window.config.BASE_URL}/login`
 });
 
 export function login(returnUrl, locale) {
   sessionStorage.setItem('delegated-admin:returnTo', returnUrl || '/users');
 
   webAuth.authorize({
-    responseType: 'id_token',
-    redirectUri: `${window.config.BASE_URL}/login`,
-    scope: 'openid roles',
     ui_locales: locale
   });
 
@@ -60,37 +60,120 @@ export function logout(logoutUrl) {
   };
 }
 
+// calls checkSession to refresh idToken
+function refreshToken () {
+  return new Promise((resolve, reject) => {
+    // invoke check session to get a new token
+    webAuth.checkSession({},
+      function(err, result) {
+        if (err) { // there was an error
+          reject(err);
+        } else {  // we got a token
+          resolve(result);
+        }
+      }
+    );
+  });
+}
+
 const processTokens = (dispatch, apiToken, returnTo) => {
-  const decodedToken = jwtDecode(apiToken);
-  if (isExpired(decodedToken)) {
-    return;
-  }
 
-  axios.defaults.headers.common.Authorization = `Bearer ${apiToken}`;
-  axios.defaults.headers.common['dae-locale'] = window.config.LOCALE || 'en';
-
-  sessionStorage.setItem('delegated-admin:apiToken', apiToken);
-
-  dispatch({
-    type: constants.LOADED_TOKEN,
-    payload: {
-      token: apiToken
+ return new Promise((resolve, reject) => {
+    const decodedToken = jwtDecode(apiToken);
+    if (isExpired(decodedToken)) {
+      return;
     }
-  });
 
-  dispatch({
-    type: constants.LOGIN_SUCCESS,
-    payload: {
-      token: apiToken,
-      decodedToken,
-      user: decodedToken,
-      returnTo
+    axios.defaults.headers.common.Authorization = `Bearer ${apiToken}`;
+    axios.defaults.headers.common['dae-locale'] = window.config.LOCALE || 'en';
+
+    sessionStorage.setItem('delegated-admin:apiToken', apiToken);
+
+    // creates an interceptor to refresh token if needed
+    axios.interceptors.request.use((config) => {
+      // get token from storage
+      const token = sessionStorage.getItem('delegated-admin:apiToken');
+      // if there is no token, or it is expired, try to get one
+      if(!token || isExpired(jwtDecode(token))){
+       return refreshToken().then((tokenResponse) => {
+          // we got one, store and load credentials
+          return processTokens(dispatch, tokenResponse.idToken).then(() => {
+            config.headers.Authorization = axios.defaults.headers.common.Authorization;  
+            return Promise.resolve(config)
+          });
+        }).catch(error => {
+          return Promise.reject(error);
+        })
+      }else{
+        // token is not expired, move on.
+        return config;
+      }
+    }, (error) => {
+      return Promise.reject(error);
+    });
+
+    axios.interceptors.response.use(response => response, (error) => {
+      const value = error.response;
+      if (value && value.status === 401 && value.data.message === 'TokenExpired') {
+        // renewToken performs authentication using username/password saved in sessionStorage/sessionStorage
+        return refreshToken().then((tokenResponse) => {
+          // we got one, store and load credentials
+          return processTokens(dispatch, tokenResponse.idToken).then(() => {
+            config.headers.Authorization = axios.defaults.headers.common.Authorization;
+            return axios.request(error.config);
+          });
+        });
+      }
+      return Promise.reject(error);
+    });
+
+    // creates an interceptor to refresh token if needed
+    axios.interceptors.request.use((config) => {
+      // get token from storage
+      const token = sessionStorage.getItem('delegated-admin:apiToken');
+      // if there is no token, or it is expired, try to get one
+      if(!token || isExpired(jwtDecode(token))){
+       return refreshToken().then((tokenResponse) => {
+          // we got one, store and load credentials
+          return processTokens(dispatch, tokenResponse.idToken).then(() => {
+            config.headers.Authorization = axios.defaults.headers.common.Authorization;  
+            return Promise.resolve(config)
+          });
+        }).catch(error => {
+          return Promise.reject(error);
+        })
+      }else{
+        // token is not expired, move on.
+        return config;
+      }
+    }, (error) => {
+      return Promise.reject(error);
+    });
+
+    dispatch({
+      type: constants.LOADED_TOKEN,
+      payload: {
+        token: apiToken
+      }
+    });
+
+    dispatch({
+      type: constants.LOGIN_SUCCESS,
+      payload: {
+        token: apiToken,
+        decodedToken,
+        user: decodedToken,
+        returnTo
+      }
+    });
+
+    if (returnTo) {
+      dispatch(push(returnTo));
     }
-  });
 
-  if (returnTo) {
-    dispatch(push(returnTo));
-  }
+    resolve();
+
+  });
 };
 
 export function loadCredentials() {
