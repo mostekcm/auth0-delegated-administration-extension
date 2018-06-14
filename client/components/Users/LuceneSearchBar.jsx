@@ -29,6 +29,7 @@ export default class SearchBar extends Component {
   }
 
   onResetSearch = () => {
+    this.setState({searchValue: ''});
     findDOMNode(this.refs.search).value = '';
     this.props.onReset();
   }
