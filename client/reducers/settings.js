@@ -73,6 +73,7 @@ export const settings = createReducer(fromJS(initialState), { // eslint-disable-
         parseFieldSection(field.property, field.edit, 'userField.edit', field.display);
         parseFieldSection(field.property, field.create, 'userField.create', field.display);
         parseFieldSection(field.property, field.search, 'userField.search', field.display);
+        parseFieldSection(field.property, field.allow, 'userField.allow', field.display);
       });
     }
     if (data.settings.errorTranslator) {
