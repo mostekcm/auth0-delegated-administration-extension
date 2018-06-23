@@ -150,7 +150,7 @@ export default class UserActions extends Component {
     }
 
     /* Check if resending verification email option is enabled */
-    const falseTriggerEmailVerified = _.filter(this.props.userFields, field => field.property === 'email_verified' && field.allow === false);
+    const falseTriggerEmailVerified = _.filter(this.props.userFields, field => field.property === 'email_verified' && field.edit === false);
     if (falseTriggerEmailVerified.length > 0) return null;
 
     return (

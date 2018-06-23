@@ -30,15 +30,25 @@ export function login(returnUrl, locale) {
   };
 }
 
-function isExpired(decodedToken) {
-  if (typeof decodedToken.exp === 'undefined') {
-    return true;
-  }
+/** Checks if a decoded token is expired **/
+function isTokenExpired(decodedToken) {
+  return isDateExpired(decodedToken.exp);
+}
 
+/** Checks if a given token exp is expired **/
+function isDateExpired(exp) {
+
+  // if there is no expiration date, return
+  if (typeof exp === 'undefined') return true;
+
+  // convert to date and store
   const d = new Date(0);
-  d.setUTCSeconds(decodedToken.exp);
+  d.setUTCSeconds(exp);
 
-  return !(d.valueOf() > (new Date().valueOf() + (1000)));
+  // check if date is expired
+  var isExpired = !(d.valueOf() > (new Date().valueOf() + (1000)));
+
+  return isExpired;
 }
 
 export function logout(logoutUrl) {
@@ -79,29 +89,35 @@ function refreshToken () {
 const processTokens = (dispatch, apiToken, returnTo) => {
 
  return new Promise((resolve, reject) => {
+
+    // check token expiration date
     const decodedToken = jwtDecode(apiToken);
-    if (isExpired(decodedToken)) {
+    if (isTokenExpired(decodedToken)) {
       return;
     }
 
     axios.defaults.headers.common.Authorization = `Bearer ${apiToken}`;
     axios.defaults.headers.common['dae-locale'] = window.config.LOCALE || 'en';
 
-    sessionStorage.setItem('delegated-admin:apiToken', apiToken);
+    sessionStorage.setItem('delegated-admin:apiToken:exp', decodedToken.exp);
 
     // creates an interceptor to refresh token if needed
     axios.interceptors.request.use((config) => {
-      // get token from storage
-      const token = sessionStorage.getItem('delegated-admin:apiToken');
+
+      // get token expiration from storage
+      const exp = sessionStorage.getItem('delegated-admin:apiToken:exp');
+
       // if there is no token, or it is expired, try to get one
-      if(!token || isExpired(jwtDecode(token))){
+      if(isDateExpired(exp)){
        return refreshToken().then((tokenResponse) => {
           // we got one, store and load credentials
           return processTokens(dispatch, tokenResponse.idToken).then(() => {
             config.headers.Authorization = axios.defaults.headers.common.Authorization;  
             return Promise.resolve(config)
           });
-        }).catch(error => {
+        })
+       .catch(error => {
+          login(returnTo, window.config.LOCALE || 'en');
           return Promise.reject(error);
         })
       }else{
@@ -124,29 +140,6 @@ const processTokens = (dispatch, apiToken, returnTo) => {
           });
         });
       }
-      return Promise.reject(error);
-    });
-
-    // creates an interceptor to refresh token if needed
-    axios.interceptors.request.use((config) => {
-      // get token from storage
-      const token = sessionStorage.getItem('delegated-admin:apiToken');
-      // if there is no token, or it is expired, try to get one
-      if(!token || isExpired(jwtDecode(token))){
-       return refreshToken().then((tokenResponse) => {
-          // we got one, store and load credentials
-          return processTokens(dispatch, tokenResponse.idToken).then(() => {
-            config.headers.Authorization = axios.defaults.headers.common.Authorization;  
-            return Promise.resolve(config)
-          });
-        }).catch(error => {
-          return Promise.reject(error);
-        })
-      }else{
-        // token is not expired, move on.
-        return config;
-      }
-    }, (error) => {
       return Promise.reject(error);
     });
 
@@ -178,8 +171,8 @@ const processTokens = (dispatch, apiToken, returnTo) => {
 
 export function loadCredentials() {
   return (dispatch) => {
-    const token = sessionStorage.getItem('delegated-admin:apiToken');
-    if (token || window.location.hash) {
+
+    if (window.location.hash) {
 
       if (window.location.hash) {
         dispatch({
@@ -207,7 +200,7 @@ export function loadCredentials() {
       }
 
       /* There was no hash, so use the token from storage */
-      return processTokens(dispatch, token);
+      //return processTokens(dispatch, token);
     }
   };
 }
